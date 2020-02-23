@@ -1,0 +1,19 @@
+{
+  "name": "social-network-graphql",
+  "version": "1.0.0",
+  "description": "Social Network Graphql API",
+  "main": "index.js",
+  "author": "Davi Souto",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "type": "module",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "dependencies": {
+    "mongoose": "^5.9.2"
+  }
+}
