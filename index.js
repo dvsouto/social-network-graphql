@@ -8,9 +8,7 @@
 import Server from "./app/server.js";
 import Database from "./app/database/index.js";
 
+const database = new Database;
 const server = new Server;
-const db = new Database;
 
-db.createUser();
-
-server.start();
+server.start(3000);

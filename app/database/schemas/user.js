@@ -12,6 +12,6 @@ var userSchema = new Mongoose.Schema({
   email: String,
 });
 
-var User = Mongoose.model('User', userSchema);
+var UserSchema = Mongoose.model('User', userSchema);
 
-export default User;
+export default UserSchema;

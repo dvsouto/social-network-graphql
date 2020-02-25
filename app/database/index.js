@@ -6,7 +6,7 @@
  */
 
 import Mongoose from 'Mongoose';
-import User from './schemas/user.js'
+import UserSchema from './schemas/user.js'
 
 export default class Database {
     constructor(){
@@ -22,22 +22,29 @@ export default class Database {
     }
 
     connect(){
-        Mongoose.connect('mongodb://localhost:27017/');
+        Mongoose.connect('mongodb://localhost:27017/social-network', { 
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
     }
 
     ////////////////////////
 
-    createUser(name, email){
-        var user = new User({
-            name: "Davi Souto",
-            "email": "davi.souto@gmail.com"
-        });
+    // createUser(name, email){
+    //     var user = new User({
+    //         name: "Davi Souto",
+    //         "email": "davi.souto@gmail.com"
+    //     });
 
-        user.save(function(err, user) {
-          if (err) return console.error(err);
-          console.dir(user);
-        });
-    }
+    //     user.save(function(err, user) {
+    //       if (err) return console.error(err);
+    //       console.dir(user);
+    //     });
+    // }
+}
+
+export {
+    UserSchema,
 }
 
 /////////////////////////
