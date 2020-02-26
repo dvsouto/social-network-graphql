@@ -5,10 +5,12 @@
  * @since 25/02/2020
  */
 
-import usersResolvers from "./usersResolvers.js";
+import helloResolvers from "app/resolvers/helloResolvers";
+import usersResolvers from "app/resolvers/usersResolvers";
 
 const resolvers = Object.assign({}, 
-    usersResolvers
+    helloResolvers,
+    usersResolvers,
 );
 
 export default resolvers;

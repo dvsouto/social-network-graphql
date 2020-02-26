@@ -1,0 +1,25 @@
+type User {
+  id: ID
+  name: String!
+  email: String!
+  location: Location
+  distance: Float
+}
+
+input UserInput {
+    name: String
+    email: String,
+    location: LocationInput
+}
+
+type Query {
+  user(id: ID!): User
+  users: [User]
+
+  nearestUsers(id: ID!, distance: Int): [User]
+}
+
+type Mutation {
+  createUser(name: String!, email: String!, location: LocationInput): User
+  updateUser(id: ID!, input: UserInput): User
+}

@@ -6,7 +6,7 @@
  */
 
 import Mongoose from 'Mongoose';
-import UserSchema from './schemas/user.js'
+import UserSchema from 'app/database/schemas/user'
 
 export default class Database {
     constructor(){

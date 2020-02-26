@@ -7,16 +7,23 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon --exec babel-node index.js",
+    "start-old": "nodemon index.js"
   },
-  "type": "module",
   "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/node": "^7.8.4",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "babel-plugin-module-resolver": "^4.0.0",
     "nodemon": "^2.0.2"
   },
   "dependencies": {
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "graphql": "^14.6.0",
+    "iconv": "^2.3.5",
+    "merge-graphql-schemas": "^1.7.6",
     "mongoose": "^5.9.2"
   }
 }

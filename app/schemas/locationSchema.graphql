@@ -1,0 +1,14 @@
+type Coordinates {
+    lat: Float!
+    lon: Float!
+}
+
+type Location {
+    type: String
+    coordinates: Coordinates
+}
+
+input LocationInput {
+    lat: Float!
+    lon: Float!
+}
