@@ -5,12 +5,12 @@
  * @since 23/02/2020
  */
 
-import Mongoose from 'Mongoose';
+import mongoose from 'mongoose';
 import UserSchema from 'app/database/schemas/user'
 
 export default class Database {
     constructor(){
-        this.db = Mongoose.connection;
+        this.db = mongoose.connection;
 
         this.db.on('error', console.error);
 
@@ -22,7 +22,7 @@ export default class Database {
     }
 
     connect(){
-        Mongoose.connect('mongodb://localhost:27017/social-network', { 
+        mongoose.connect('mongodb://localhost:27017/social-network', { 
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
