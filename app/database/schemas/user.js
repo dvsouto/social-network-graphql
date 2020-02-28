@@ -5,9 +5,9 @@
  * @author Davi Souto
  * @since 23/02/2020
  */
-import Mongoose from 'Mongoose';
+import mongoose from 'mongoose';
 
-var userSchema = new Mongoose.Schema({
+var userSchema = new mongoose.Schema({
   name: String,
   email: String,
   location: {
@@ -45,6 +45,6 @@ var userSchema = new Mongoose.Schema({
 
 userSchema.index({location: '2dsphere'});
 
-var UserSchema = Mongoose.model('User', userSchema);
+var UserSchema = mongoose.model('User', userSchema);
 
 export default UserSchema;

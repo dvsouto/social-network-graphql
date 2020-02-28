@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon --exec babel-node index.js",
+    "start-prod": "pm2 start index.js --interpreter babel-node --name social-network",
     "start-old": "nodemon index.js"
   },
   "devDependencies": {
