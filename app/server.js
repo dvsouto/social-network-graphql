@@ -4,6 +4,7 @@ import { buildSchema } from "graphql";
 
 import typesDefs from "app/schemas";
 import resolvers from "app/resolvers";
+import Authorization from "app/authorization";
 
 const app = express();
 
@@ -14,30 +15,23 @@ export default class Server {
      * @since 25/02/2020
      */
     constructor(){
-        // const schema = buildSchema(`
-        //   type User {
-        //     id: ID
-        //     name: String!
-        //     email: String!
-        //   }
-        //   type Query {
-        //     user(id: ID!): User
-        //     users: [User]
-        //   }
-        //   type Mutation {
-        //     createUser(name: String!, email: String!): User
-        //   }
-        // `);
-
         const schema = buildSchema(typesDefs);
 
 
+        // Request initial page
+        app.get("/", (req, res) => res.send("GraphQL Server Online !"));
+
+        // Authorization Middleware
+        app.use(Authorization.ContextMiddleware);
+
+        // Init GraphQL 
         app.use(
-            "/graphql",
-            expressGraphql({
-                schema,
-                rootValue: resolvers,
-                graphiql: true
+          "/graphql",
+          expressGraphql({
+            schema,
+            rootValue: resolvers,
+            graphiql: true,
+            // context: () => Authorization.getContext()
           })
         );
 

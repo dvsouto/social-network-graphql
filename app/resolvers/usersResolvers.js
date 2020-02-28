@@ -7,9 +7,22 @@
  */
 import { UserSchema } from "app/database";
 import { getDistance } from "app/util/distance";
+import Authorization from "app/authorization";
+
+import bcrypt from "bcrypt";
+import lodash from "lodash";
+import jwt from "jsonwebtoken";
 
 export default {
-    async user({ id }) {
+    /**
+     * Find one user
+     * @param string id
+     * @author Davi Souto
+     * @since 27/02/2020
+     */
+    async user({ id }, context) {
+        Authorization.isAuthorized();
+
         var user = await UserSchema.findById(id);
         
         if (user)
@@ -29,7 +42,15 @@ export default {
 
         return user;
     },
-    async users() {
+
+    /**
+     * Return all users
+     * @author Davi Souto
+     * @since 27/02/2020
+     */
+    async users(_, context) {
+        Authorization.isAuthorized();
+
         var users = await UserSchema.find({ });
 
         users = users.map((user) => {
@@ -48,23 +69,100 @@ export default {
 
         return users;
     },
-    async createUser({ name, email, location }) {
-        var obj_user = {
-            "name": name,
-            "email": email,
-        };
 
+    /**
+     * Return the users count on database
+     * @author Davi Souto
+     * @since 28/02/2020
+     */
+    async usersCount() {
+        Authorization.isAuthorized(context);
 
-        if (location)
+        var count_users = UserSchema.countDocuments({});
+
+        return count_users;
+    },
+
+    ///////////////////////
+
+    /**
+     * Validate user login and return jwt token
+     * @param string email
+     * @param string password
+     * @author Davi Souto
+     * @since 28/02/2020
+     */
+    async login({ email, password }, context) {
+        var user = await UserSchema.findOne({ email: email.toLowerCase().trim() });
+
+        if (! user)
+            throw new Error("Email não cadastrado !");
+
+        // Verify password
+        const validate_password = bcrypt.compareSync(password, user.password);
+
+        if (! validate_password)
+            throw new Error("Senha incorreta !");
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user._id, email: user.email }, Authorization.SECRET, { expiresIn: Authorization.EXPIRES_TIME })
+
+        return {
+            token: token,
+        }
+    },
+
+    /**
+     * Create an user
+     * @param string name
+     * @param string email
+     * @param Location location
+     * @author Davi Souto
+     * @since 27/02/2020
+     */
+    async createUser({ input }, context) {
+        var obj_user = input;
+
+        obj_user.name = lodash.startCase(obj_user.name).trim();
+        obj_user.last_name = lodash.startCase(obj_user.last_name).trim();
+        obj_user.email = obj_user.email.toLowerCase().trim();
+        obj_user.document = obj_user.document.replace(/[^0-9]/g, '');
+
+        // Validate password min length
+        if (input.password.length < 6)
+            throw new Error("Senha deve conter no mínimo 6 caracteres !");
+
+        // Validate password min length
+        if (input.password.length > 30)
+            throw new Error("Senha deve conter no máximo 30 caracteres !");
+
+        // Validate document
+        if (obj_user.document.length < 11)
+            throw new Error("CPF precisa ser um documento válido !")
+
+        // Crypt password
+        const password_hash = bcrypt.hashSync(input.password, 10);
+
+        obj_user.password = password_hash;
+
+        if (input.location)
         {
             obj_user = {
                 ...obj_user,
                 location: {
                     type: "Point",
-                    coordinates: [ location.lon, location.lat ]
+                    coordinates: [ input.location.lon, input.location.lat ]
                 }
             }
         }
+
+        // Validate email
+        if (await UserSchema.findOne({ "email": obj_user.email }))
+            throw new Error("Email já cadastrado !");
+
+        // Validate document
+        if (await UserSchema.findOne({ "document": obj_user.document }))
+            throw new Error("CPF já cadastrado !");
 
         var user = new UserSchema(obj_user);
 
@@ -84,21 +182,37 @@ export default {
 
         return user;
     },
-    async updateUser({ id, input }) {
-        // const user = await UserSchema.findById(id);
 
-        // if (! user)
-        //     throw new Error("Usuário inexistente !");
+    /**
+     * Update an user
+     * @param string id
+     * @param Object input
+     * @author Davi Souto
+     * @since 27/02/2020
+     */
+    async updateUser({ id, input }, context) {
+        Authorization.isAuthorized();
 
+        const find_user = await UserSchema.findById(id);
 
-        console.log("INPUT:", input);
+        if (! find_user)
+            throw new Error("Usuário inexistente !");
 
         const user = await UserSchema.findByIdAndUpdate(id, input, { new: true });
 
         return user;
     },
 
-    async nearestUsers({ id, distance }) {
+    /**
+     * Return the users nearest of the user id using the max distance
+     * @param string id
+     * @param int distance
+     * @author Davi Souto
+     * @since 28/02/2020
+     */
+    async nearestUsers({ id, distance }, context) {
+        Authorization.isAuthorized();
+
         if (! distance || distance <= 0)
             distance = 1000;
 

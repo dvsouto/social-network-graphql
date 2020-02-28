@@ -1,25 +1,47 @@
 type User {
   id: ID
   name: String!
+  last_name: String!
   email: String!
+  document: String!
+  password: String!
   location: Location
   distance: Float
 }
 
-input UserInput {
-    name: String
+type AuthorizationToken {
+  token: String!
+}
+
+input UserInputUpdate {
+    name: String,
+    last_name: String,
     email: String,
+    document: String,
+    password: String,
     location: LocationInput
+}
+
+input UserInputCreate {
+  name: String!, 
+  last_name: String!, 
+  email: String!, 
+  document: String!, 
+  password: String!, 
+  location: LocationInput
 }
 
 type Query {
   user(id: ID!): User
   users: [User]
+  usersCount: Int
 
   nearestUsers(id: ID!, distance: Int): [User]
 }
 
 type Mutation {
-  createUser(name: String!, email: String!, location: LocationInput): User
-  updateUser(id: ID!, input: UserInput): User
+  login(email: String!, password: String!): AuthorizationToken
+
+  createUser(input: UserInputCreate): User
+  updateUser(id: ID!, input: UserInputUpdate): User
 }

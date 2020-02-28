@@ -8,8 +8,11 @@
 import mongoose from 'mongoose';
 
 var userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
+  name: { type: String, required: true },
+  last_name: { type: String, required: true },
+  email: { type: String, required: true },
+  document: { type: String, required: true },
+  password: { type: String, required: true },
   location: {
     type: {
         type: String,
