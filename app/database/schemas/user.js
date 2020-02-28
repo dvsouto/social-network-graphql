@@ -23,6 +23,26 @@ var userSchema = new Mongoose.Schema({
   }
 });
 
+/**
+ * @TODO
+ * Criar campos:
+ *  - password
+ *  - token
+ *  - reset_password_token
+ *  - confirmation_code
+ *  - login_tentatives
+ *  - retry_login_time
+ *  - status (1 = active / 2 = inactive / 3 - wait_confirm / 4 = temp_ban)
+ *  - ban_reason
+ *  - ban_time
+ *  - biography
+ *  - photo
+ *  - genre
+ *  - filter_genre
+ *  - filter_distance
+ *  - account_type [default: normal] (normal / pro / admin)
+ */
+
 userSchema.index({location: '2dsphere'});
 
 var UserSchema = Mongoose.model('User', userSchema);
