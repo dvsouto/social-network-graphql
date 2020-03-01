@@ -234,6 +234,7 @@ const usersResolvers = {
         });
 
         nearest_users = nearest_users.map(current_user => {
+            // Calc distance of user
             var distance = getDistance({
                 latitude: user.location.coordinates[1],
                 longitude: user.location.coordinates[0]
@@ -242,10 +243,16 @@ const usersResolvers = {
                 longitude: current_user.location.coordinates[0],
             });
 
-
             return {
                 ...current_user._doc,
                 id: current_user._doc._id,
+                location: {
+                    ...current_user._doc.location,
+                    coordinates: {
+                        lat: current_user._doc.location.coordinates[1],
+                        lon: current_user._doc.location.coordinates[0],
+                    }
+                }
                 distance,
             };
         })
