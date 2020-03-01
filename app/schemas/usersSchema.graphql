@@ -11,15 +11,7 @@ type User {
 
 type AuthorizationToken {
   token: String!
-}
-
-input UserInputUpdate {
-    name: String,
-    last_name: String,
-    email: String,
-    document: String,
-    password: String,
-    location: LocationInput
+  user: User
 }
 
 input UserInputCreate {
@@ -31,17 +23,30 @@ input UserInputCreate {
   location: LocationInput
 }
 
+input UserInputUpdate {
+    name: String,
+    last_name: String,
+    email: String,
+    document: String,
+    password: String,
+    location: LocationInput
+}
+
 type Query {
   user(id: ID!): User
   users: [User]
   usersCount: Int
-
   nearestUsers(id: ID!, distance: Int): [User]
+
+  currentUser: User
+  nearestUsersOfMe(distance: Int): [User]
 }
 
 type Mutation {
   login(email: String!, password: String!): AuthorizationToken
 
-  createUser(input: UserInputCreate): User
+  createUser(input: UserInputCreate!): User
   updateUser(id: ID!, input: UserInputUpdate): User
+
+  updateMyLocation(input: LocationInput!): User
 }

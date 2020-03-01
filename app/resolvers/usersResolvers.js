@@ -13,7 +13,7 @@ import bcrypt from "bcrypt";
 import lodash from "lodash";
 import jwt from "jsonwebtoken";
 
-export default {
+const usersResolvers = {
     /**
      * Find one user
      * @param string id
@@ -21,7 +21,7 @@ export default {
      * @since 27/02/2020
      */
     async user({ id }, context) {
-        Authorization.isAuthorized();
+        await Authorization.isAuthorized();
 
         var user = await UserSchema.findById(id);
         
@@ -49,7 +49,7 @@ export default {
      * @since 27/02/2020
      */
     async users(_, context) {
-        Authorization.isAuthorized();
+        await Authorization.isAuthorized();
 
         var users = await UserSchema.find({ });
 
@@ -109,6 +109,7 @@ export default {
 
         return {
             token: token,
+            user: user,
         }
     },
 
@@ -191,7 +192,7 @@ export default {
      * @since 27/02/2020
      */
     async updateUser({ id, input }, context) {
-        Authorization.isAuthorized();
+        await Authorization.isAuthorized();
 
         const find_user = await UserSchema.findById(id);
 
@@ -211,7 +212,7 @@ export default {
      * @since 28/02/2020
      */
     async nearestUsers({ id, distance }, context) {
-        Authorization.isAuthorized();
+        await Authorization.isAuthorized();
 
         if (! distance || distance <= 0)
             distance = 1000;
@@ -250,5 +251,70 @@ export default {
         })
 
         return nearest_users;
+    },
+
+    ////////////////////////////////
+
+    /**
+     * Returns de current user by jwt token
+     * @author Davi Souto
+     * @since 01/03/2020
+     */
+    async currentUser(_, context) {
+        const current_user = await Authorization.isAuthorized();
+        const current_user_with_location = await this.user({ id: current_user.id }, context);
+
+        return current_user_with_location;
+    },
+
+    /**
+     * Return the users nearest of me using the max distance
+     * @param int distance
+     * @author Davi Souto
+     * @since 01/03/2020
+     */
+    async nearestUsersOfMe({ distance }, context) {
+        const user = await Authorization.isAuthorized();
+        const nearest_users = await this.nearestUsers({ id: user._id, distance }, context);
+
+        return nearest_users;
+    },
+
+    /**
+     * Update location of logged user
+     * @param Object input
+     * @author Davi Souto
+     * @since 27/02/2020
+     */
+    async updateMyLocation({ input }, context) {
+        const user = await Authorization.isAuthorized();
+
+        const location_update = {
+            location: {
+                type: "Point",
+                coordinates: [ input.lon, input.lat ]
+            }
+        }
+
+        var updated_user = await UserSchema.findByIdAndUpdate(user._id, location_update, { new: true });
+
+        if (updated_user)
+        {
+            var updated_user = {
+                ...updated_user._doc,
+                id: updated_user._doc._id,
+                location: {
+                    ...updated_user._doc.location,
+                    coordinates: {
+                        lat: updated_user._doc.location.coordinates[1],
+                        lon: updated_user._doc.location.coordinates[0],
+                    }
+                }
+            }
+        }
+
+        return updated_user;
     }
 }
+
+export default usersResolvers;
