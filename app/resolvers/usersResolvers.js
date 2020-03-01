@@ -252,7 +252,7 @@ const usersResolvers = {
                         lat: current_user._doc.location.coordinates[1],
                         lon: current_user._doc.location.coordinates[0],
                     }
-                }
+                },
                 distance,
             };
         })
