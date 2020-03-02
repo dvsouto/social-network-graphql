@@ -6,6 +6,7 @@ type User {
   document: String!
   password: String!
   location: Location
+  photo: String
   distance: Float
 }
 
@@ -32,6 +33,12 @@ input UserInputUpdate {
     location: LocationInput
 }
 
+input UserInputProfileUpdate {
+  name: String,
+  last_name: String,
+  photo: Upload,
+}
+
 type Query {
   user(id: ID!): User
   users: [User]
@@ -49,4 +56,5 @@ type Mutation {
   updateUser(id: ID!, input: UserInputUpdate): User
 
   updateMyLocation(input: LocationInput!): User
+  updateMyProfile(input: UserInputProfileUpdate!): User
 }

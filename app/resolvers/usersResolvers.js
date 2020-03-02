@@ -13,6 +13,11 @@ import bcrypt from "bcrypt";
 import lodash from "lodash";
 import jwt from "jsonwebtoken";
 
+import fs from "fs";
+import path from "path";
+import { createWriteStream } from "fs";
+import crypto from "crypto";
+
 const usersResolvers = {
     /**
      * Find one user
@@ -319,6 +324,66 @@ const usersResolvers = {
                 }
             }
         }
+
+        return updated_user;
+    },
+
+    /**
+     * Update profile of logged user
+     * @author Davi Souto
+     * @since 02/03/2020
+     */
+    async updateMyProfile({ input }, context) {
+        const user = await Authorization.isAuthorized();
+        const storage_path = path.resolve(__dirname + "/../storage/pictures/profile");
+
+        var added_photo = false;
+
+        // Update profile picture
+        if (input.photo && input.photo.file)
+        {
+            const new_file_name = crypto.randomBytes(20).toString('hex');
+            var ext_file = "";
+
+            const { filename, mimetype, createReadStream } = await input.photo.file;
+
+            // Get file ext
+            switch(mimetype.toLowerCase())
+            {
+                case "image/jpeg":
+                case "image/jpg":
+                    ext_file = ".jpg";
+                break;
+
+                case "image/png":
+                    ext_file = ".png";
+                break;
+            }
+
+            const final_filename = new_file_name + ext_file;
+
+            // Save new photo
+            const stream = await createReadStream()
+                .pipe(createWriteStream(storage_path + "/" + final_filename));
+
+            added_photo = final_filename;
+        }
+
+        var obj_update = input;
+
+        // Update photo field and delete old image
+        if (added_photo)
+        {
+            // Delete old file
+            try {
+                if (user.photo)
+                   fs.unlinkSync(storage_path + "/" + user.photo);
+            } catch(err) { }
+
+            obj_update.photo = added_photo;
+        }
+
+        var updated_user = await UserSchema.findByIdAndUpdate(user._id, obj_update, { new: true });
 
         return updated_user;
     }

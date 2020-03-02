@@ -1,6 +1,7 @@
 import express from "express";
 import expressGraphql from "express-graphql";
 import { buildSchema } from "graphql";
+import { graphqlUploadExpress } from "graphql-upload";
 
 import typesDefs from "app/schemas";
 import resolvers from "app/resolvers";
@@ -27,6 +28,7 @@ export default class Server {
         // Init GraphQL 
         app.use(
           "/graphql",
+          graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 1 }), // 10mb Max
           expressGraphql({
             schema,
             rootValue: resolvers,
