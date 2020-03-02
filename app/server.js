@@ -7,6 +7,9 @@ import typesDefs from "app/schemas";
 import resolvers from "app/resolvers";
 import Authorization from "app/authorization";
 
+import fs from "fs";
+import path from "path";
+
 const app = express();
 
 export default class Server {
@@ -21,6 +24,32 @@ export default class Server {
 
         // Request initial page
         app.get("/", (req, res) => res.send("GraphQL Server Online !"));
+
+        // Picture profile
+        app.get("/storage/profile/:photo", (req, res) => {
+            const photo_file = req.params.photo;
+
+            try {
+                const storage_path = path.resolve(__dirname + "/storage/pictures/profile");
+                const photo_read = fs.readFileSync(storage_path + "/" + photo_file);
+
+                var type = false;
+
+                if (photo_file.toLowerCase().indexOf(".jpg") > 0) type = "image/jpeg";
+                if (photo_file.toLowerCase().indexOf(".jpeg") > 0) type = "image/jpeg";
+                if (photo_file.toLowerCase().indexOf(".png") > 0) type = "image/png";
+                if (photo_file.toLowerCase().indexOf(".gif") > 0) type = "image/gif";
+
+                if (type)
+                {
+                    res.writeHead(200, {'Content-Type': type });
+                    res.end(photo_read, 'binary');
+                } else throw new Error("Invalid image");
+
+            } catch (err) {
+                res.send("Image not exists, " + err);
+            }
+        });
 
         // Authorization Middleware
         app.use(Authorization.ContextMiddleware);
